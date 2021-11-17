@@ -1,2 +1,9 @@
 --pycache__/
+*.pyc
+*.pyo
+
+dist/
+*.egg-info
+*.egg
+
 venv/
