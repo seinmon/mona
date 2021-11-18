@@ -16,7 +16,7 @@ setup(name='monalyza',
       author_email='hossein.monjezi@stud.uni-saarland.de',
       license='MIT',
       packages=['monalyza', 
-               'monalyza.*'],
+               'monalyza.monitoring'],
       classifiers=[
           'Environment :: Console'
           'Development Status :: 2 - Pre-Alpha',
@@ -32,4 +32,5 @@ setup(name='monalyza',
           'Operating System :: OS Independent'
           'Intended Audience :: Developers'
       ],
+      install_requires=['psutil'],
       zip_safe=False)
