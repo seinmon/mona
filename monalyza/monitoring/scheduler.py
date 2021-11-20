@@ -10,8 +10,9 @@ class Scheduler:
 
     def schedule(self, monitoring_function):
         print("PID is valid: Scheduling...")
-        self.running = True
-        self.scheduled_timer = threading.Timer(self.interval, monitoring_function).start()
+        if monitoring_function is not None:
+            self.running = True
+            self.scheduled_timer = threading.Timer(self.interval, monitoring_function).start()
 
     def cancel_scheduler(self):
         print("PID is invalid: Cancelling existing timers...")
