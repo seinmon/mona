@@ -1,6 +1,6 @@
---pycache__/
-*.pyc
-*.pyo
+**/--pycache__/
+**/*.pyc
+**/*.pyo
 
 dist/
 *.egg-info
