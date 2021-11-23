@@ -1,38 +1,42 @@
 import psutil
-from monitoring import scheduler
+from . import scheduler
 
 
 class Monitoring(scheduler.Scheduler):
 
     def __init__(self, interval, proc_name):
-        super().__init__(interval)
+        self.scheduler = scheduler.Scheduler(interval)
 
         for proc in psutil.process_iter():
             if proc.name() == proc_name:
                 self.pid = proc.pid
                 return
 
-        print("Process not found")
-        quit(1)
-
-    def memory(self):
+        raise ProcessLookupError("Could not find process with the given name", proc_name)
+        
+    def run(self):
         try:
-            memory_info = psutil.Process(self.pid).memory_info()
+            process = psutil.Process(self.pid)
+
+            print(process.memory_info()) 
+            print(process.cpu_percent(interval=1))
 
         except psutil.NoSuchProcess:
-            super().cancel_scheduler()
+            self.scheduler.cancel_scheduler()
 
         else:
-            print(memory_info)
-            super().schedule(self.memory)
+            self.scheduler.schedule(self.run)
 
-    def cpu(self):
-        try:
-            cpu_load = psutil.Process(self.pid).cpu_percent(interval=1)
+    # def read_memory(self, process):
+    #     try: 
+    #         print(process.memory_info()) 
 
-        except psutil.NoSuchProcess:
-            super().cancel_scheduler()
+    #     except psutil.NoSuchProcess:
+    #         pass
 
-        else:
-            print(cpu_load)
-            super().schedule(self.cpu)
+    # def read_cpu(self, process):
+    #     try: 
+    #         print(process.cpu_percent(interval=1))
+
+    #     except psutil.NoSuchProcess:
+    #         pass
