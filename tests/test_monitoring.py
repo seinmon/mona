@@ -1,16 +1,15 @@
 import unittest
-from unittest.mock import MagicMock
+# from unittest.mock import MagicMock
+from monalyza.monitoring import monitoring
 
 
 class TestMonitoring(unittest.TestCase):
-    def setUp(self) -> None:
-        return super().setUp()
 
     def test_proc_exist(self):
-        pass
+
 
     def test_proc_not_exist(self):
-        pass
+        self.assertRaises(ProcessLookupError, monitoring.Monitoring, 1, "invalid_proc_name")
 
     def test_memory_pid_valid(self):
         pass
