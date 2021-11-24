@@ -1,8 +1,5 @@
 import unittest
-from unittest.mock import DEFAULT, MagicMock, patch
-
-from psutil import cpu_percent
-import psutil
+from unittest.mock import patch
 from monalyza.monitoring.monitoring import Monitoring
 
 
