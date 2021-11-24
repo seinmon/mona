@@ -12,7 +12,8 @@ class Monitoring(scheduler.Scheduler):
                 self.pid = proc.pid
                 return
 
-        raise ProcessLookupError("Could not find process with the given name", proc_name)
+        raise ProcessLookupError("Could not find process with the given name",
+                                 proc_name)
         
     def run(self):
         try:
