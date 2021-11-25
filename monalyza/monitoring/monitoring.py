@@ -15,18 +15,21 @@ class Monitoring(scheduler.Scheduler):
         raise ProcessLookupError("Could not find process with the given name",
                                  proc_name)
         
-    def run(self):
+    def run(self, read_memory=False, read_cpu=False):
         try:
             process = psutil.Process(self.pid)
 
-            print(process.memory_info()) 
-            print(process.cpu_percent(interval=1))
+            if read_memory:
+                print(process.memory_info()) 
+
+            if read_cpu:
+                print(process.cpu_percent(interval=1))
 
         except psutil.NoSuchProcess:
             self.scheduler.cancel_scheduler()
 
         else:
-            self.scheduler.schedule(self.run)
+            self.scheduler.schedule(self.run, read_memory=read_memory, read_cpu=read_cpu)
 
     # def read_memory(self, process):
     #     try: 

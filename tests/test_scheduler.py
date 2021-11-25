@@ -25,7 +25,7 @@ class TestScheduler(unittest.TestCase):
     def test_scheduling_with_function(self, mock_timer):
         self.scheduler.schedule(())
         self.assertTrue(self.scheduler.running)
-        mock_timer.assert_called_once_with(self.interval, ())
+        mock_timer.assert_called_once_with(self.interval, (), {})
         
     def test_scheduled_function(self):
         mock_monitoring_function = MagicMock()

@@ -12,4 +12,4 @@ if __name__ == '__main__':
         quit(1)
         
     else:
-        monitor.run()
+        monitor.run(False, True)
