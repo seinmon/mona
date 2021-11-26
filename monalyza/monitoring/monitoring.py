@@ -1,3 +1,4 @@
+import time
 import psutil
 from . import buffer
 from . import scheduler
@@ -5,14 +6,24 @@ from . import scheduler
 
 class Monitoring(scheduler.Scheduler):
 
-    def __init__(self, process, interval=None, buffer_size_mb=None):
-        if buffer_size_mb is not None:
-            self.buffer = buffer.Buffer(buffer_size_mb * 1000000)
+    def __init__(self,
+                 process,
+                 interval=None,
+                 buffer_size=None,
+                 output_file=None):
+        self.first_run = True
+
+        if buffer_size is not None:
+            if output_file is None:
+                output_file = 'measurement_output.csv'
+            self.buffer = buffer.Buffer(buffer_size, output_file)
+
         else:
             self.buffer = None
 
         if interval is not None:
             self.scheduler = scheduler.Scheduler(interval)
+
         else:
             self.scheduler = None
 
@@ -40,6 +51,21 @@ class Monitoring(scheduler.Scheduler):
             self.buffer.write_data()
 
         else:
+            if self.first_run:
+                headers = None
+
+                if read_memory and read_cpu:
+                    headers = ('time', 'memory', 'cpu')
+
+                elif read_memory:
+                    headers = ('time', 'memory')
+
+                elif read_cpu:
+                    headers = ('time', 'cpu')
+
+                self.buffer.append_to_buffer(headers)
+                self.first_run = False
+
             if resource_info is not None:
                 self.buffer.append_to_buffer(resource_info)
             self.scheduler.schedule(self.run,
@@ -71,5 +97,6 @@ class Monitoring(scheduler.Scheduler):
         return resource_info
     
     def generate_timestamp(self):
-        return 1
+        """ Return current time in seconds """
+        return round(time.time())
 
