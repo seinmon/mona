@@ -5,18 +5,19 @@ from . import monitoring
 class Buffer:
     
     def __init__(self, buffer_size):
-        self.data = dict()
-        self.self_monitoring = monitoring.Monitoring(getpid(), interval=1) 
+        self.data = [] 
+        self.buffer_monitoring = monitoring.Monitoring(getpid(), interval=1) 
         self.buffer_size = buffer_size
 
-    def append_to_buffer(self, column_title, data):
-        if column_title in self.data:
-            self.data[column_title].append(data)
+    def append_to_buffer(self, data):
+        self.data.append(data)
 
-        else:
-            self.data[column_title] = [data]
+        print(self.data)
 
-        print(self.data[column_title])
+        if self.buffer_monitoring.read_resource(
+            read_memory=True)[1] > self.buffer_size:
+            self.write_data()
 
-        # TODO: Check memory for this process and write to data frame, then append to a csv file
+    def write_data(self):
+        pass
 

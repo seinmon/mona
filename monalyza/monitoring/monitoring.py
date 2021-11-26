@@ -8,66 +8,68 @@ class Monitoring(scheduler.Scheduler):
     def __init__(self, process, interval=None, buffer_size_mb=None):
         if buffer_size_mb is not None:
             self.buffer = buffer.Buffer(buffer_size_mb * 1000000)
+        else:
+            self.buffer = None
 
         if interval is not None:
             self.scheduler = scheduler.Scheduler(interval)
+        else:
+            self.scheduler = None
 
         for proc in psutil.process_iter():
             if proc.name() == process or proc.pid == process:
                 self.pid = proc.pid
                 return
 
-        raise ProcessLookupError("Could not find process with the given name",
+        raise ProcessLookupError('Could not find process with the given name',
                                  process)
         
     def run(self, read_memory=False, read_cpu=False):
+        if self.scheduler is None or self.buffer is None:
+            raise UnboundLocalError(
+                'Unexpectped value:',
+                self.buffer,
+                self.scheduler,
+                'Either interval or buffer_size_mb is missing')
+
         try:
-            process = psutil.Process(self.pid)
-
-            if read_memory:
-                self.read_memory(process)
-
-            if read_cpu:
-                self.read_cpu(process)
+            resource_info = self.read_resource(read_memory, read_cpu)
 
         except psutil.NoSuchProcess:
             self.scheduler.cancel_scheduler()
+            self.buffer.write_data()
 
         else:
-            self.scheduler.schedule(self.run, read_memory=read_memory, 
+            if resource_info is not None:
+                self.buffer.append_to_buffer(resource_info)
+            self.scheduler.schedule(self.run,
+                                    read_memory=read_memory, 
                                     read_cpu=read_cpu)
 
-    def read_memory(self, process=None):
-        try: 
-            if process is None:
-                process = psutil.Process(self.pid)
+    def read_resource(self, read_memory=False, read_cpu=False):
+        resource_info = None
 
-            memory_info = process.memory_info()
+        try: 
+            process = psutil.Process(self.pid)
+
+            if read_memory and read_cpu:
+                resource_info = (self.generate_timestamp(),
+                                 process.memory_info()[0],
+                                 process.cpu_percent(interval=1))
+
+            elif read_memory:
+                resource_info = (self.generate_timestamp(),
+                                 process.memory_info()[0])
+
+            elif read_cpu:
+                resource_info = (self.generate_timestamp(),
+                                 process.cpu_percent(interval=1))
             
         except psutil.NoSuchProcess as error:
             return error
 
-        else:
-            if hasattr(self, 'buffer'):
-                self.buffer.append_to_buffer('Memory', memory_info)
-            
-            else:
-                return memory_info
-
-    def read_cpu(self, process=None):
-        try: 
-            if process is None:
-                process = psutil.Process(self.pid)
-
-            cpu_percent = process.cpu_percent(interval=1)
-            
-        except psutil.NoSuchProcess as error:
-            return error
-
-        else:
-            if hasattr(self, 'buffer'):
-                self.buffer.append_to_buffer('CPU', cpu_percent)
-            
-            else:
-                return cpu_percent
+        return resource_info
+    
+    def generate_timestamp(self):
+        return 1
 

@@ -10,7 +10,9 @@ class Scheduler:
     def schedule(self, monitoring_function, **params):
         if monitoring_function is not None:
             self.running = True
-            self.scheduled_timer = threading.Timer(self.interval, monitoring_function, params)
+            self.scheduled_timer = threading.Timer(self.interval,
+                                                   monitoring_function,
+                                                   params)
             self.scheduled_timer.start()
 
     def cancel_scheduler(self):
