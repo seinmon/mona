@@ -35,7 +35,7 @@ class Monitoring(scheduler.Scheduler):
         raise ProcessLookupError('Could not find process with the given name',
                                  process)
         
-    def run(self, read_memory=False, read_cpu=False):
+    def run_repeated(self, read_memory=False, read_cpu=False):
         if self.scheduler is None or self.buffer is None:
             raise UnboundLocalError(
                 'Unexpectped value:',
@@ -66,9 +66,8 @@ class Monitoring(scheduler.Scheduler):
                 self.buffer.append_to_buffer(headers)
                 self.first_run = False
 
-            if resource_info is not None:
-                self.buffer.append_to_buffer(resource_info)
-            self.scheduler.schedule(self.run,
+            self.buffer.append_to_buffer(resource_info)
+            self.scheduler.schedule(self.run_repeated,
                                     read_memory=read_memory, 
                                     read_cpu=read_cpu)
 
@@ -91,10 +90,11 @@ class Monitoring(scheduler.Scheduler):
                 resource_info = (self.generate_timestamp(),
                                  process.cpu_percent(interval=1))
             
-        except psutil.NoSuchProcess as error:
-            return error
+        except psutil.NoSuchProcess: 
+            raise
 
-        return resource_info
+        else:
+            return resource_info
     
     def generate_timestamp(self):
         """ Return current time in seconds """

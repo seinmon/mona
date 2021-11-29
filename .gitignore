@@ -4,6 +4,8 @@
 **/*.pyc
 **/*.pyo
 
+**/*.orig
+
 dist/
 *.egg-info
 *.egg

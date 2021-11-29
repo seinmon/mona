@@ -14,16 +14,14 @@ class Buffer:
     def append_to_buffer(self, data):
         self.data.append(data)
 
-        print(self.data)
-
-        # if self.buffer_monitoring.read_resource(
-        #     read_memory=True)[1] > self.buffer_size:
-        #         self.write_data()
-        self.write_data()
+        if self.buffer_monitoring.read_resource(
+            read_memory=True)[1] > self.buffer_size:
+                self.write_data()
 
     def write_data(self):
         with open(self.output_file, 'a+') as csv_output:
-            writer = csv.writer(csv_output)
-            writer.writerows(self.data)
-            self.data.clear()
+            if self.data:
+                writer = csv.writer(csv_output)
+                writer.writerows(self.data)
+                self.data.clear()
 

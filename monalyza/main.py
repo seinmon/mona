@@ -15,5 +15,5 @@ if __name__ == '__main__':
         quit(1)
         
     else:
-        monitor.run(True, True)
+        monitor.run_repeated(True, True)
 
