@@ -4,7 +4,7 @@ from . import buffer
 from . import scheduler
 
 
-class Monitoring(scheduler.Scheduler):
+class Monitoring:
 
     def __init__(self,
                  process,
