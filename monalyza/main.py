@@ -34,6 +34,3 @@ def main():
         monitor.run_repeatedly(True, True)
         return 0
 
-
-if __name__ == '__main__':
-    main()
