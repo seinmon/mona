@@ -1,8 +1,24 @@
+from os import path
 import sys
-from monitoring import monitoring
+import logging
+# import argparse
+from monalyza.monitoring import monitoring
 
 
-if __name__ == '__main__':
+def initialize_logger(level=logging.WARNING):
+    logging.basicConfig(
+        filename=path.join(path.expanduser('~'), '.monalyza.log'),
+        encoding='utf-8',
+        level=level,
+        format=
+        '%(asctime)s [%(levelname)s] [%(threadName)s/%(thread)d] %(message)s')
+
+    logging.getLogger().addHandler(logging.StreamHandler())
+
+
+def main():
+    logging.info('Starting...')
+    initialize_logger()
     process = sys.argv[1]
 
     try: 
@@ -11,9 +27,13 @@ if __name__ == '__main__':
                                         buffer_size=12000000)
 
     except ProcessLookupError as p_err:
-        print(repr(p_err))
-        quit(1)
+        logging.error(repr(p_err))
+        return 1
         
     else:
         monitor.run_repeatedly(True, True)
+        return 0
 
+
+if __name__ == '__main__':
+    main()

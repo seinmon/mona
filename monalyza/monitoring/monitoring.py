@@ -1,3 +1,4 @@
+import logging
 import time
 import psutil
 from . import buffer
@@ -13,26 +14,32 @@ class Monitoring:
                  output_file=None):
         self.first_run = True
 
+        logging.info('Initializing monitoring.')
+
         if buffer_size is not None:
             if output_file is None:
                 output_file = 'measurement_output.csv'
             self.buffer = buffer.Buffer(buffer_size, output_file)
 
         else:
+            logging.info('No buffer is created.')
             self.buffer = None
 
         if interval is not None:
             self.scheduler = scheduler.Scheduler(interval)
 
         else:
+            logging.info('No scheduler is created.')
             self.scheduler = None
 
+        logging.info('Iterating over processes to find %s.', process)
         for proc in psutil.process_iter():
             if proc.name() == process or proc.pid == process:
+                logging.debug('Process found.')
                 self.pid = proc.pid
                 return
 
-        raise ProcessLookupError('Could not find process with the given name',
+        raise ProcessLookupError('Could not find process',
                                  process)
         
     def run_repeatedly(self, read_memory=False, read_cpu=False):
@@ -101,5 +108,6 @@ class Monitoring:
     
     def generate_timestamp(self):
         """ Return current time in seconds """
+        # This method does not return the exact time
         return time.time()
 
