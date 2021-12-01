@@ -101,5 +101,5 @@ class Monitoring:
     
     def generate_timestamp(self):
         """ Return current time in seconds """
-        return round(time.time())
+        return time.time()
 

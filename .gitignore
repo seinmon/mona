@@ -10,5 +10,6 @@ dist/
 *.egg-info
 *.egg
 
+output/
 venv/
 .DS_Store
