@@ -35,7 +35,7 @@ class Monitoring:
         raise ProcessLookupError('Could not find process with the given name',
                                  process)
         
-    def run_repeated(self, read_memory=False, read_cpu=False):
+    def run_repeatedly(self, read_memory=False, read_cpu=False):
         if self.scheduler is None or self.buffer is None:
             raise UnboundLocalError(
                 'Unexpectped value:',
@@ -55,19 +55,19 @@ class Monitoring:
                 headers = None
 
                 if read_memory and read_cpu:
-                    headers = ('time', 'memory', 'cpu')
+                    headers = ('pid', 'time', 'memory', 'cpu')
 
                 elif read_memory:
-                    headers = ('time', 'memory')
+                    headers = ('pid', 'time', 'memory')
 
                 elif read_cpu:
-                    headers = ('time', 'cpu')
+                    headers = ('pid', 'time', 'cpu')
 
                 self.buffer.append_to_buffer(headers)
                 self.first_run = False
 
             self.buffer.append_to_buffer(resource_info)
-            self.scheduler.schedule(self.run_repeated,
+            self.scheduler.schedule(self.run_repeatedly,
                                     read_memory=read_memory, 
                                     read_cpu=read_cpu)
 
@@ -78,16 +78,19 @@ class Monitoring:
             process = psutil.Process(self.pid)
 
             if read_memory and read_cpu:
-                resource_info = (self.generate_timestamp(),
+                resource_info = (process.pid,
+                                 self.generate_timestamp(),
                                  process.memory_info()[0],
-                                 process.cpu_percent(interval=1))
+                                 process.cpu_percent(interval=0.1))
 
             elif read_memory:
-                resource_info = (self.generate_timestamp(),
+                resource_info = (process.pid,
+                                 self.generate_timestamp(),
                                  process.memory_info()[0])
 
             elif read_cpu:
-                resource_info = (self.generate_timestamp(),
+                resource_info = (process.pid,
+                                 self.generate_timestamp(),
                                  process.cpu_percent(interval=1))
             
         except psutil.NoSuchProcess: 
