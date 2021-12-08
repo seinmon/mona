@@ -13,3 +13,6 @@ dist/
 output/
 venv/
 .DS_Store
+
+**/*.csv
+**/*.log
