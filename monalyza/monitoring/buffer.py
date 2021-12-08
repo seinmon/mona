@@ -1,20 +1,20 @@
 import csv
 import logging
 from os import getpid
-from . import monitoring
+from monalyza.monitoring import single_process_monitoring as spm
 
 
 class Buffer:
     
     def __init__(self, buffer_size, output_file):
-        logging.info('Initializing buffer.')
+        logging.debug('Initializing buffer.')
         self.output_file = output_file
         self.data = [] 
-        self.buffer_monitoring = monitoring.Monitoring(getpid()) 
+        self.buffer_monitoring = spm.SingleProcessMonitoring(getpid()) 
         self.buffer_size = buffer_size
 
     def append_to_buffer(self, data):
-        logging.info('Appending to buffer.')
+        logging.debug('Appending to buffer.')
         self.data.append(data)
 
         if self.buffer_monitoring.read_resource(

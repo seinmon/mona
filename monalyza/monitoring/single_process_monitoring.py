@@ -1,48 +1,35 @@
 import logging
 import time
 import psutil
-from . import buffer
-from . import scheduler
+from monalyza.monitoring import scheduler, proc
 
-
-class Monitoring:
+class SingleProcessMonitoring(proc.Proc):
 
     def __init__(self,
                  process,
                  interval=None,
-                 buffer_size=None,
-                 output_file=None):
-        self.first_run = True
+                 buffer=None,
+                 hide_headers=False):
+        try:
+            proc.Proc.__init__(self, process)
 
-        logging.info('Initializing monitoring.')
+        except ProcessLookupError:
+            raise
 
-        if buffer_size is not None:
-            if output_file is None:
-                output_file = 'measurement_output.csv'
-            self.buffer = buffer.Buffer(buffer_size, output_file)
+        self.first_run = not hide_headers
 
-        else:
-            logging.info('No buffer is created.')
-            self.buffer = None
+        logging.debug('Initializing single process monitoring.')
+        self.buffer = buffer
 
         if interval is not None:
             self.scheduler = scheduler.Scheduler(interval)
 
         else:
-            logging.info('No scheduler is created.')
             self.scheduler = None
 
-        logging.info('Iterating over processes to find %s.', process)
-        for proc in psutil.process_iter():
-            if proc.name() == process or proc.pid == process:
-                logging.debug('Process found.')
-                self.pid = proc.pid
-                return
-
-        raise ProcessLookupError('Could not find process',
-                                 process)
-        
     def run_repeatedly(self, read_memory=False, read_cpu=False):
+        """ Repeat measurements periodically. """
+        
         if self.scheduler is None or self.buffer is None:
             raise UnboundLocalError(
                 'Unexpectped value:',
@@ -79,6 +66,7 @@ class Monitoring:
                                     read_cpu=read_cpu)
 
     def read_resource(self, read_memory=False, read_cpu=False):
+        """ Measure resources only once. It is used inside run_repeatedly. """
         resource_info = None
 
         try: 
