@@ -9,12 +9,6 @@ help:
 	@echo "clean:		clean build, and compiled python files"
 	@echo "delete_venv: 	delete virtual environment"
 	
-venv_install:
-	(\
-		python3 -m venv ./venv; \
-		source venv/bin/activate; \
-		python3 -m pip install .)
-
 install:
 	python3 -m pip install .
 
