@@ -1,7 +1,6 @@
 .PHONY: clean_pyc clean_build clean
 
 help:
-	@echo "venv_install:	install in a virtual environment"
 	@echo "install:	install on system"
 	@echo "run_tests:	run all unit/integration tests"
 	@echo "clean_pyc: 	clean compiled python files"
