@@ -49,13 +49,13 @@ class SingleProcessMonitoring(proc.Proc):
                 headers = None
 
                 if read_memory and read_cpu:
-                    headers = ('pid', 'time', 'memory', 'cpu')
+                    headers = ('time', 'memory', 'cpu')
 
                 elif read_memory:
-                    headers = ('pid', 'time', 'memory')
+                    headers = ('time', 'memory')
 
                 elif read_cpu:
-                    headers = ('pid', 'time', 'cpu')
+                    headers = ('time', 'cpu')
 
                 self.buffer.append_to_buffer(headers)
                 self.first_run = False
@@ -73,19 +73,16 @@ class SingleProcessMonitoring(proc.Proc):
             process = psutil.Process(self.pid)
 
             if read_memory and read_cpu:
-                resource_info = (process.pid,
-                                 self.generate_timestamp(),
+                resource_info = (self.generate_timestamp(),
                                  process.memory_info()[0],
                                  process.cpu_percent(interval=0.1))
 
             elif read_memory:
-                resource_info = (process.pid,
-                                 self.generate_timestamp(),
+                resource_info = (self.generate_timestamp(),
                                  process.memory_info()[0])
 
             elif read_cpu:
-                resource_info = (process.pid,
-                                 self.generate_timestamp(),
+                resource_info = (self.generate_timestamp(),
                                  process.cpu_percent(interval=1))
             
         except psutil.NoSuchProcess: 
@@ -95,7 +92,7 @@ class SingleProcessMonitoring(proc.Proc):
             return resource_info
     
     def generate_timestamp(self):
-        """ Return current time in seconds """
+        """ Return current time in miliseconds """
         # This method does not return the exact time
-        return time.time()
+        return int(time.time() * 1000)
 

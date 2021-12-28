@@ -35,11 +35,12 @@ class RecursiveMonitoring(threading.Thread, proc.Proc):
 
         while True:
             try:
-                self.get_children()
+                self.monitor_children()
             except psutil.NoSuchProcess:
+                logging.debug('Main process is finished.')
                 return
 
-    def get_children(self):
+    def monitor_children(self):
         try:
             children = psutil.Process(self.pid).children()
 
@@ -60,4 +61,10 @@ class RecursiveMonitoring(threading.Thread, proc.Proc):
                         target=monitor.run_repeatedly,
                         kwargs={'read_memory':True, 'read_cpu':True}
                     ).start()
+
+            for process in self.processes:
+                if process not in children:
+                    self.processes.remove(process)
+                    logging.debug('%s is dead, and removed from processes list',
+                                 process)
                 

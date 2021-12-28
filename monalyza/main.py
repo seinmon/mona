@@ -4,7 +4,7 @@ import logging
 # import argparse
 from monalyza.monitoring import buffer
 
-def initialize_logger(level=logging.INFO):
+def initialize_logger(level=logging.DEBUG):
     print(path.join(path.expanduser('~'), '.monalyza.log'))
     logging.basicConfig(
         filename=path.join(path.expanduser('~'), '.monalyza.log'),
