@@ -15,8 +15,7 @@ setup(name='monalyza',
       author='Hossein Monjezi',
       author_email='hossein.monjezi@stud.uni-saarland.de',
       license='MIT',
-      packages=['monalyza', 
-               'monalyza.monitoring'],
+      packages=['monalyza', 'monalyza.monitoring'],
       classifiers=[
           'Environment :: Console'
           'Development Status :: 2 - Pre-Alpha',

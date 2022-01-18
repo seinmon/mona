@@ -13,7 +13,7 @@ class RecursiveMonitoring(threading.Thread, proc.Proc):
             raise
 
         threading.Thread.__init__(self)
-             
+
         logging.debug('Initializing recursive monitoring.')
         self.interval = interval
         self.buffer = buffer
@@ -21,8 +21,8 @@ class RecursiveMonitoring(threading.Thread, proc.Proc):
 
     def run(self):
         logging.debug('Running RecursiveMonitoring.')
-        
-        try: 
+
+        try:
             self.processes.append(psutil.Process(self.pid))
         except psutil.NoSuchProcess:
             raise
@@ -31,7 +31,8 @@ class RecursiveMonitoring(threading.Thread, proc.Proc):
                                               self.interval,
                                               self.buffer)
         threading.Thread(target=monitor.run_repeatedly,
-                         kwargs={'read_memory':True, 'read_cpu':True}).start()
+                         kwargs={'read_memory': True,
+                                 'read_cpu': True}).start()
 
         while True:
             try:
@@ -59,12 +60,10 @@ class RecursiveMonitoring(threading.Thread, proc.Proc):
                                                           True)
                     threading.Thread(
                         target=monitor.run_repeatedly,
-                        kwargs={'read_memory':True, 'read_cpu':True}
+                        kwargs={'read_memory': True, 'read_cpu': True}
                     ).start()
 
             for process in self.processes:
                 if process not in children:
+                    logging.debug('Removing %s from processes list', process)
                     self.processes.remove(process)
-                    logging.debug('%s is dead, and removed from processes list',
-                                 process)
-                

@@ -3,6 +3,7 @@ import time
 import psutil
 from monalyza.monitoring import scheduler, proc
 
+
 class SingleProcessMonitoring(proc.Proc):
 
     def __init__(self,
@@ -29,7 +30,7 @@ class SingleProcessMonitoring(proc.Proc):
 
     def run_repeatedly(self, read_memory=False, read_cpu=False):
         """ Repeat measurements periodically. """
-        
+
         if self.scheduler is None or self.buffer is None:
             raise UnboundLocalError(
                 'Unexpectped value:',
@@ -62,14 +63,14 @@ class SingleProcessMonitoring(proc.Proc):
 
             self.buffer.append_to_buffer(resource_info)
             self.scheduler.schedule(self.run_repeatedly,
-                                    read_memory=read_memory, 
+                                    read_memory=read_memory,
                                     read_cpu=read_cpu)
 
     def read_resource(self, read_memory=False, read_cpu=False):
         """ Measure resources only once. It is used inside run_repeatedly. """
         resource_info = None
 
-        try: 
+        try:
             process = psutil.Process(self.pid)
 
             if read_memory and read_cpu:
@@ -87,15 +88,14 @@ class SingleProcessMonitoring(proc.Proc):
                 resource_info = (process.pid,
                                  self.generate_timestamp(),
                                  process.cpu_percent(interval=1))
-            
-        except psutil.NoSuchProcess: 
+
+        except psutil.NoSuchProcess:
             raise
 
         else:
             return resource_info
-    
+
     def generate_timestamp(self):
         """ Return current time in miliseconds """
         # This method does not return the exact time
         return int(time.time() * 1000)
-

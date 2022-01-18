@@ -4,14 +4,14 @@ import logging
 # import argparse
 from monalyza.monitoring import buffer
 
+
 def initialize_logger(level=logging.DEBUG):
-    print(path.join(path.expanduser('~'), '.monalyza.log'))
     logging.basicConfig(
         filename=path.join(path.expanduser('~'), '.monalyza.log'),
         encoding='utf-8',
         level=level,
-        format=
-        '%(asctime)s [%(levelname)s] [%(threadName)s/%(thread)d] %(message)s')
+        format='%(asctime)s [%(levelname)s]'
+        '[%(threadName)s/%(thread)d] %(message)s')
 
     logging.getLogger().addHandler(logging.StreamHandler())
 
@@ -41,7 +41,7 @@ def main():
     except ProcessLookupError as p_err:
         logging.error(repr(p_err))
         return 1
-        
+
     else:
         if recursive:
             monitor.start()
@@ -50,4 +50,3 @@ def main():
             monitor.run_repeatedly(True, True)
 
         return 0
-

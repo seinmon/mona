@@ -11,11 +11,10 @@ class TestMonitoring(unittest.TestCase):
         def name(self):
             return 'FakeProcess'
 
-
     def setUp(self):
         self.patcher = patch('psutil.process_iter',
                              return_value=[self.MockProc()]).start()
-        self.monitoring = Monitoring('FakeProcess', 1, 1000000, 'test_output')  
+        self.monitoring = Monitoring('FakeProcess', 1, 1000000, 'test_output')
 
     def tearDown(self):
         self.patcher.stop()
@@ -33,12 +32,11 @@ class TestMonitoring(unittest.TestCase):
     @patch('monalyza.monitoring.scheduler.Scheduler.schedule')
     @patch('psutil.Process')
     def test_run_pid_valid(self, mock_psutil_process, mock_schedule):
-       self.monitoring.run_repeatedly()
-       mock_psutil_process.assert_called_once_with(self.MockProc.pid)
-       mock_schedule.assert_called_once()
+        self.monitoring.run_repeatedly()
+        mock_psutil_process.assert_called_once_with(self.MockProc.pid)
+        mock_schedule.assert_called_once()
 
     @patch('monalyza.monitoring.scheduler.Scheduler.cancel_scheduler')
     def test_run_pid_invalid(self, mock_cancel):
         self.monitoring.run_repeatedly()
         mock_cancel.assert_called_once()
-

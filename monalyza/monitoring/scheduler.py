@@ -5,7 +5,7 @@ import logging
 class Scheduler:
     def __init__(self, interval):
         logging.info('Initializing scheduler with interval %s.', interval)
-        self.scheduled_timer = None 
+        self.scheduled_timer = None
         self.running = False
         self.interval = interval
 
@@ -25,4 +25,3 @@ class Scheduler:
             self.running = False
             self.scheduled_timer.cancel()
             logging.info('Timer cancelled.')
-
