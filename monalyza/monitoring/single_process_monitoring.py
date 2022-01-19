@@ -4,32 +4,34 @@ import psutil
 from monalyza.monitoring import scheduler, proc
 
 
-class SingleProcessMonitoring(proc.Proc):
-
+class SingleProcessMonitoring:
+    """ Monitoring a single process without its children. """
     def __init__(self,
                  process,
                  interval=None,
                  buffer=None,
                  hide_headers=False):
         try:
-            proc.Proc.__init__(self, process)
+            self.pid = proc.get_pid_of_process(process)
 
+        # pylint: disable=try-except-raise
         except ProcessLookupError:
             raise
 
-        self.first_run = not hide_headers
-
-        logging.debug('Initializing single process monitoring.')
-        self.buffer = buffer
-
-        if interval is not None:
-            self.scheduler = scheduler.Scheduler(interval)
-
         else:
-            self.scheduler = None
+            self.first_run = not hide_headers
+
+            logging.debug('Initializing single process monitoring.')
+            self.buffer = buffer
+
+            if interval is not None:
+                self.scheduler = scheduler.Scheduler(interval)
+
+            else:
+                self.scheduler = None
 
     def run_repeatedly(self, read_memory=False, read_cpu=False):
-        """ Repeat measurements periodically. """
+        """ Repeat measuring periodically. """
 
         if self.scheduler is None or self.buffer is None:
             raise UnboundLocalError(
@@ -90,12 +92,14 @@ class SingleProcessMonitoring(proc.Proc):
                                  process.cpu_percent(interval=1))
 
         except psutil.NoSuchProcess:
+            logging.error('Process %s no longer exists.', self.pid)
             raise
 
         else:
             return resource_info
 
-    def generate_timestamp(self):
+    @staticmethod
+    def generate_timestamp():
         """ Return current time in miliseconds """
         # This method does not return the exact time
         return int(time.time() * 1000)

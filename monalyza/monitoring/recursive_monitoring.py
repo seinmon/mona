@@ -4,27 +4,32 @@ import psutil
 from monalyza.monitoring import proc, single_process_monitoring as spm
 
 
-class RecursiveMonitoring(threading.Thread, proc.Proc):
-
+class RecursiveMonitoring(threading.Thread):
+    """ Monitor a process and its children. """
     def __init__(self, process, interval, buffer):
         try:
-            proc.Proc.__init__(self, process)
+            self.pid = proc.get_pid_of_process(process)
+
+        # pylint: disable=try-except-raise
         except ProcessLookupError:
             raise
 
         threading.Thread.__init__(self)
 
-        logging.debug('Initializing recursive monitoring.')
+        logging.info('Initializing recursive monitoring.')
         self.interval = interval
         self.buffer = buffer
         self.processes = []
 
     def run(self):
+        """ Start a monitoring thread for the main process.
+            Also check for the child processes. """
         logging.debug('Running RecursiveMonitoring.')
 
         try:
             self.processes.append(psutil.Process(self.pid))
         except psutil.NoSuchProcess:
+            logging.debug('Main process is finished.')
             raise
 
         monitor = spm.SingleProcessMonitoring(self.pid,
@@ -38,14 +43,16 @@ class RecursiveMonitoring(threading.Thread, proc.Proc):
             try:
                 self.monitor_children()
             except psutil.NoSuchProcess:
-                logging.debug('Main process is finished.')
+                logging.info('No longer monitoring for children.')
                 return
 
     def monitor_children(self):
+        """ Starts a thread to monitor children of the main process. """
         try:
             children = psutil.Process(self.pid).children()
 
         except psutil.NoSuchProcess:
+            logging.info('Cannot find children - Main process is finished.')
             raise
 
         else:

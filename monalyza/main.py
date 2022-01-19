@@ -2,10 +2,12 @@ from os import path
 import sys
 import logging
 # import argparse
-from monalyza.monitoring import buffer
+from monalyza.monitoring import buffer, recursive_monitoring
+import monalyza.monitoring.single_process_monitoring as smp
 
 
-def initialize_logger(level=logging.DEBUG):
+def initialize_logger(level=logging.INFO, verbose_print=False):
+    """ Initialize logger with specified level. """
     logging.basicConfig(
         filename=path.join(path.expanduser('~'), '.monalyza.log'),
         encoding='utf-8',
@@ -13,10 +15,12 @@ def initialize_logger(level=logging.DEBUG):
         format='%(asctime)s [%(levelname)s]'
         '[%(threadName)s/%(thread)d] %(message)s')
 
-    logging.getLogger().addHandler(logging.StreamHandler())
+    if verbose_print:
+        logging.getLogger().addHandler(logging.StreamHandler())
 
 
 def main():
+    """ Starting point of the application. """
     initialize_logger()
     logging.info('Starting...')
     process = sys.argv[1]
@@ -27,13 +31,11 @@ def main():
 
     try:
         if recursive:
-            from monalyza.monitoring import recursive_monitoring
             monitor = recursive_monitoring.RecursiveMonitoring(process,
                                                                1,
                                                                output_buffer)
 
         else:
-            import monalyza.monitoring.single_process_monitoring as smp
             monitor = smp.SingleProcessMonitoring(process,
                                                   interval=1,
                                                   buffer=output_buffer)

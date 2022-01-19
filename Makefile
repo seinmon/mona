@@ -1,35 +1,42 @@
-.PHONY: clean_pyc clean_build clean test_flake8 unittest
+.PHONY: help install test unittest test_flake8 test_pylint \
+		clean_pyc clean_build clean
 
 help:
-	@echo "install:	install on system"
-	@echo "run_tests:	run all unit/integration tests"
-	@echo "test_flake8:	run flake8 on all files"
-	@echo "clean_pyc: 	clean compiled python files"
-	@echo "clean_build:	clean build files"
-	@echo "clean:		clean build, and compiled python files"
-	@echo "delete_venv: 	delete virtual environment"
+	@echo "make install:		install package"
+	@echo "make run_tests:		run all integration/unit tests"
+	@echo "make test_flake8:	run flake8"
+	@echo "make test_pylint:	run pylint"
+	@echo "make clean_pyc: 	clean compiled python files"
+	@echo "make clean_build:	clean build files"
+	@echo "make clean:		clean build, and compiled python files"
 	
 install:
+	@echo "Installing..."
 	python3 -m pip install .
 
-run_tests: test_flake8 unittest
+test: unittest test_flake8 test_pylint
 
 unittest:
+	@echo "Running integration/unittests..."
 	python3 -m unittest
 
 test_flake8:
-	flake8
+	@echo "Running flake8..."
+	flake8 --exclude venv
 
-delete_venv:
-	rm -rf ./venv
+test_pylint:
+	@echo "Running pylint..."
+	pylint monalyza.py monalyza tests
 
 clean_pyc:
+	@echo "Deleting compiled python files..."
 	find . -name '*.pyc' -exec rm -f {} +
 	find . -name '*.pyo' -exec rm -f {} +
 	find . -name '*~' -exec rm -f {} +
 	find . -name '__pycache__' -exec rm -fr {} +
 	
 clean_build:
+	@echo "Deleting build files..."
 	rm -fr build/
 	rm -fr dist/
 	rm -fr .eggs/

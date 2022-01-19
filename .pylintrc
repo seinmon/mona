@@ -1,0 +1,14 @@
+[MESSAGE CONTROL]
+disable=
+    fixme,
+    missing-module-docstring,
+    no-name-in-module
+    
+extension-pkg-whitelist=
+    psutil
+
+[TYPECHECK]
+generated-members=
+    psutil.Process,
+    psutil.NoSuchProcess
+    psutil.process_iter()
