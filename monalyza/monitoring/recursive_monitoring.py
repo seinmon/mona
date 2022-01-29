@@ -1,7 +1,7 @@
 import logging
 import threading
 import psutil
-from monalyza.monitoring import proc, single_process_monitoring as spm
+from monalyza.monitoring import proc, scheduler, single_process_monitoring as spm
 
 
 class RecursiveMonitoring(threading.Thread):
@@ -25,6 +25,7 @@ class RecursiveMonitoring(threading.Thread):
         """ Start a monitoring thread for the main process.
             Also check for the child processes. """
         logging.debug('Running RecursiveMonitoring.')
+        child_scheduler = scheduler.Scheduler(0.01)
 
         try:
             self.processes.append(psutil.Process(self.pid))
@@ -39,12 +40,12 @@ class RecursiveMonitoring(threading.Thread):
                          kwargs={'read_memory': True,
                                  'read_cpu': True}).start()
 
-        while True:
-            try:
-                self.monitor_children()
-            except psutil.NoSuchProcess:
-                logging.info('No longer monitoring for children.')
-                return
+        try:
+            child_scheduler.schedule(self.monitor_children())
+        except psutil.NoSuchProcess:
+            logging.info('No longer monitoring for children.')
+            child_scheduler.cancel_scheduler()
+            return
 
     def monitor_children(self):
         """ Starts a thread to monitor children of the main process. """
