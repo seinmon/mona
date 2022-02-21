@@ -11,6 +11,8 @@ class SingleProcessMonitoring:
                  interval=None,
                  buffer=None,
                  hide_headers=False):
+        self.initial_start_time = 0
+
         try:
             self.pid = proc.get_pid_of_process(process)
 
@@ -98,8 +100,11 @@ class SingleProcessMonitoring:
         else:
             return resource_info
 
-    @staticmethod
-    def generate_timestamp():
+    def generate_timestamp(self):
         """ Return current time in miliseconds """
-        # This method does not return the exact time
-        return int(time.time() * 1000)
+        current_time = int(time.time())
+
+        if self.initial_start_time == 0:
+            self.initial_start_time = current_time 
+
+        return (current_time - self.initial_start_time)
