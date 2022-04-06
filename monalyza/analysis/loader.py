@@ -9,11 +9,11 @@ def get_dataframe_from_csv(csv):
     return pd.read_csv(csv)
 
 
-def combine_csv_measurements(csv, by_group):
+def combine_csv_measurements(csv, group):
     """ Combine measurements that have similar values in a certain column. """
     data = get_dataframe_from_csv(csv)
-    logging.debug("Merging values based on %s column", by_group)
-    return data.groupby(by_group)[data.columns[2:]].sum()
+    logging.debug("Merging values based on %s column", group)
+    return data.groupby(group)[data.columns[2:]].sum()
 
 
 if __name__ == '__main__':

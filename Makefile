@@ -3,7 +3,7 @@
 
 help:
 	@echo "make install:		install package"
-	@echo "make run_tests:		run all integration/unit tests"
+	@echo "make unittest:		run all integration/unit tests"
 	@echo "make test_flake8:	run flake8"
 	@echo "make test_pylint:	run pylint"
 	@echo "make clean_pyc: 	clean compiled python files"
