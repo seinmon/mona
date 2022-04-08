@@ -32,4 +32,5 @@ setup(name='monalyza',
           'Intended Audience :: Developers'
       ],
       install_requires=['psutil', 'pandas', 'matplotlib', 'scipy'],
+      entry_points={'console_scripts': ['monalyza=monalyza.main:main']},
       zip_safe=False)
