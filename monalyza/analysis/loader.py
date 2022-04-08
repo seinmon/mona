@@ -1,20 +1,27 @@
-""" Loads csv file, and performs a certain action on its content. """
 import logging
 import pandas as pd
 
 
-def get_dataframe_from_csv(csv):
-    """ Create dataframe based on the measurement values in csv file. """
-    logging.debug("Creating dataframe from %s file", csv)
-    return pd.read_csv(csv)
+class Loader:
+    """ Load the measurements, and prepare values for analysis. """
 
+    def __init__(self, measurements):
+        """ Create dataframe based on the measurement values in csv file. """
+        logging.debug("Creating dataframe from %s file", measurements)
+        self.data = pd.read_csv(measurements)
 
-def combine_csv_measurements(csv, group):
-    """ Combine measurements that have similar values in a certain column. """
-    data = get_dataframe_from_csv(csv)
-    logging.debug("Merging values based on %s column", group)
-    return data.groupby(group)[data.columns[2:]].sum()
+    def combine_values_by(self, group):
+        """ Combine measurements that have similar values in a certain column.
+        """
+        logging.debug("Merging values based on %s column", group)
+        return self.data.groupby(group)[self.data.columns[2:]].sum()
 
+    def get_column(self, column):
+        """ Get the values in a certain column as list. """
+        return self.data.loc[:, column]
 
-if __name__ == '__main__':
-    print(combine_csv_measurements('measurements_output.csv', 'time'))
+    def combine_and_get_column(self, group, column):
+        """ Combine measurements that have similar values in a certain column,
+        then return a column. """
+        data = self.combine_values_by(group)
+        return data.loc[:, column]
