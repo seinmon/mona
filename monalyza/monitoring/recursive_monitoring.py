@@ -1,7 +1,8 @@
 import logging
 import threading
 import psutil
-from monalyza.monitoring import proc, scheduler, single_process_monitoring as spm
+import monalyza.monitoring.single_process_monitoring as spm
+from monalyza.monitoring import proc, scheduler
 
 
 class RecursiveMonitoring(threading.Thread):

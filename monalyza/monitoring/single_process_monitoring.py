@@ -105,6 +105,6 @@ class SingleProcessMonitoring:
         current_time = int(time.time())
 
         if self.initial_start_time == 0:
-            self.initial_start_time = current_time 
+            self.initial_start_time = current_time
 
         return (current_time - self.initial_start_time)
