@@ -31,5 +31,5 @@ setup(name='monalyza',
           'Operating System :: OS Independent'
           'Intended Audience :: Developers'
       ],
-      install_requires=['psutil', 'pandas', 'matplotlib'],
+      install_requires=['psutil', 'pandas', 'matplotlib', 'scipy'],
       zip_safe=False)
