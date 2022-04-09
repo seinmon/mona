@@ -5,17 +5,16 @@ from monalyza.monitoring import single_process_monitoring as spm
 
 
 class Buffer:
-    """ Writes the data to a csv file, after a memory threshold is reached. """
-    def __init__(self, buffer_size, output_file):
+    """Write the measurements to a csv file, once a threshold is reached."""
+    def __init__(self, buffer_size: int, output_file: str) -> None:
         logging.debug('Initializing buffer.')
         self.output_file = output_file
         self.data = []
         self.buffer_monitoring = spm.SingleProcessMonitoring(getpid())
         self.buffer_size = buffer_size
 
-    def append_to_buffer(self, data):
-        """ Appends the data to the buffer.
-            Also triggers the write functionality if necessary. """
+    def append_to_buffer(self, data: list) -> None:
+        """Add data to the buffer, and write to csv file if it is necessary."""
         logging.debug('Appending to buffer.')
         self.data.append(data)
 
@@ -24,8 +23,8 @@ class Buffer:
             logging.debug('Writing to file.')
             self.write_data()
 
-    def write_data(self):
-        """ Writes data to file, and clears the buffer. """
+    def write_data(self) -> None:
+        """Writes data to file, and clears the buffer."""
         with open(self.output_file, 'a+', encoding='UTF-8') as csv_output:
             if self.data:
                 writer = csv.writer(csv_output)

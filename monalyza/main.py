@@ -1,13 +1,14 @@
 from os import path
 import sys
 import logging
-# import argparse
 from monalyza.monitoring import buffer, recursive_monitoring
 import monalyza.monitoring.single_process_monitoring as smp
 
 
-def initialize_logger(level=logging.INFO, verbose_print=False):
-    """ Initialize logger with specified level. """
+def initialize_logger(level: int = logging.DEBUG,
+                      verbose_print: bool = False) -> None:
+    """Initialize logger with the specified logging level.
+    If you want to print logs while executing, set verbose_print to true."""
     logging.basicConfig(
         filename=path.join(path.expanduser('~'), '.monalyza.log'),
         encoding='utf-8',
@@ -19,11 +20,12 @@ def initialize_logger(level=logging.INFO, verbose_print=False):
         logging.getLogger().addHandler(logging.StreamHandler())
 
 
-def main():
-    """ Starting point of the application. """
+def main() -> int:
+    """Starting point of the application."""
+
     initialize_logger()
     logging.info('Starting...')
-    process = sys.argv[1]
+    command = sys.argv[1]
 
     # TODO: Change recursive flag to a command option
     recursive = True
@@ -31,12 +33,12 @@ def main():
 
     try:
         if recursive:
-            monitor = recursive_monitoring.RecursiveMonitoring(process,
+            monitor = recursive_monitoring.RecursiveMonitoring(command,
                                                                1,
                                                                output_buffer)
 
         else:
-            monitor = smp.SingleProcessMonitoring(process,
+            monitor = smp.SingleProcessMonitoring(command,
                                                   interval=1,
                                                   buffer=output_buffer)
 

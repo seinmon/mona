@@ -5,7 +5,7 @@ from monalyza.monitoring import scheduler, proc
 
 
 class SingleProcessMonitoring:
-    """ Monitoring a single process without its children. """
+    """Monitor a single process without its children."""
     def __init__(self,
                  process,
                  interval=None,
@@ -33,7 +33,7 @@ class SingleProcessMonitoring:
                 self.scheduler = None
 
     def run_repeatedly(self, read_memory=False, read_cpu=False):
-        """ Repeat measuring periodically. """
+        """Measure resource consumption of a specific process repeatedly."""
 
         if self.scheduler is None or self.buffer is None:
             raise UnboundLocalError(
@@ -70,8 +70,9 @@ class SingleProcessMonitoring:
                                     read_memory=read_memory,
                                     read_cpu=read_cpu)
 
-    def read_resource(self, read_memory=False, read_cpu=False):
-        """ Measure resources only once. It is used inside run_repeatedly. """
+    def read_resource(self, read_memory: bool = False,
+                      read_cpu: bool = False) -> tuple | None:
+        """Measure resource consumption of a specific process."""
         resource_info = None
 
         try:
@@ -100,11 +101,11 @@ class SingleProcessMonitoring:
         else:
             return resource_info
 
-    def generate_timestamp(self):
-        """ Return current time in miliseconds """
+    def generate_timestamp(self) -> int:
+        """Get time difference in seconds, since initial time."""
         current_time = int(time.time())
 
         if self.initial_start_time == 0:
             self.initial_start_time = current_time
 
-        return (current_time - self.initial_start_time)
+        return current_time - self.initial_start_time
