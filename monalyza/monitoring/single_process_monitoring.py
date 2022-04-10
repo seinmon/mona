@@ -1,40 +1,38 @@
 import logging
 import time
+from typing import TYPE_CHECKING
 import psutil
-from monalyza.monitoring import scheduler, proc
+from monalyza.monitoring import scheduler
+
+
+if TYPE_CHECKING:
+    from monalyza.monitoring.buffer import Buffer
 
 
 class SingleProcessMonitoring:
     """Monitor a single process without its children."""
+
     def __init__(self,
-                 process,
-                 interval=None,
-                 buffer=None,
-                 hide_headers=False):
+                 pid: int,
+                 interval: float = None,
+                 buffer: 'Buffer' = None,
+                 hide_headers: bool = False) -> None:
         self.initial_start_time = 0
+        self.pid = pid
+        self.first_run = not hide_headers
 
-        try:
-            self.pid = proc.get_pid_of_process(process)
+        logging.debug('Initializing single process monitoring.')
+        self.buffer = buffer
 
-        # pylint: disable=try-except-raise
-        except ProcessLookupError:
-            raise
+        if interval is not None:
+            self.scheduler = scheduler.Scheduler(interval)
 
         else:
-            self.first_run = not hide_headers
+            self.scheduler = None
 
-            logging.debug('Initializing single process monitoring.')
-            self.buffer = buffer
-
-            if interval is not None:
-                self.scheduler = scheduler.Scheduler(interval)
-
-            else:
-                self.scheduler = None
-
-    def run_repeatedly(self, read_memory=False, read_cpu=False):
+    def run_repeatedly(self, read_memory: bool = False,
+                       read_cpu: bool = False) -> None:
         """Measure resource consumption of a specific process repeatedly."""
-
         if self.scheduler is None or self.buffer is None:
             raise UnboundLocalError(
                 'Unexpectped value:',

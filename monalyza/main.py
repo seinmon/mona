@@ -1,7 +1,7 @@
 from os import path
 import sys
 import logging
-from monalyza.monitoring import buffer, recursive_monitoring
+from monalyza.monitoring import proc, buffer, recursive_monitoring
 import monalyza.monitoring.single_process_monitoring as smp
 
 
@@ -22,24 +22,29 @@ def initialize_logger(level: int = logging.DEBUG,
 
 def main() -> int:
     """Starting point of the application."""
-
     initialize_logger()
     logging.info('Starting...')
-    command = sys.argv[1]
+    command = sys.argv[1:]
 
     # TODO: Change recursive flag to a command option
     recursive = True
     output_buffer = buffer.Buffer(12000000, 'measurements_output.csv')
 
     try:
+        pid = proc.get_pid_of_process(command)
+
+    except ProcessLookupError:
+        if isinstance(command, list):
+            pid = proc.execute_process(command)
+        else:
+            raise
+    try:
         if recursive:
-            monitor = recursive_monitoring.RecursiveMonitoring(command,
-                                                               1,
+            monitor = recursive_monitoring.RecursiveMonitoring(pid, 1,
                                                                output_buffer)
 
         else:
-            monitor = smp.SingleProcessMonitoring(command,
-                                                  interval=1,
+            monitor = smp.SingleProcessMonitoring(pid, interval=1,
                                                   buffer=output_buffer)
 
     except ProcessLookupError as p_err:
@@ -47,7 +52,7 @@ def main() -> int:
         return 1
 
     else:
-        if recursive:
+        if isinstance(monitor, recursive_monitoring.RecursiveMonitoring):
             monitor.start()
 
         else:
