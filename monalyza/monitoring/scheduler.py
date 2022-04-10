@@ -11,6 +11,7 @@ class Scheduler:
         self.running = False
         self.interval = interval
 
+    # TODO: Add type annotations
     def schedule(self, task, **params) -> None:
         """Schedule a function to be executed with **params as parameters."""
         logging.info('Scheduling the next run.')

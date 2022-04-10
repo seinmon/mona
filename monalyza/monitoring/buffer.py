@@ -1,6 +1,7 @@
 import csv
 import logging
 from os import getpid
+from typing import Any
 from monalyza.monitoring import single_process_monitoring as spm
 
 
@@ -13,15 +14,16 @@ class Buffer:
         self.buffer_monitoring = spm.SingleProcessMonitoring(getpid())
         self.buffer_size = buffer_size
 
-    def append_to_buffer(self, data: list) -> None:
+    def append_to_buffer(self, data: Any) -> None:
         """Add data to the buffer, and write to csv file if it is necessary."""
         logging.debug('Appending to buffer.')
         self.data.append(data)
 
-        if self.buffer_monitoring.read_resource(
-                read_memory=True)[1] > self.buffer_size:
-            logging.debug('Writing to file.')
-            self.write_data()
+        used_buffer = self.buffer_monitoring.read_resource(read_memory=True)
+        if used_buffer is not None:
+            if used_buffer[1] > self.buffer_size:
+                logging.debug('Writing to file.')
+                self.write_data()
 
     def write_data(self) -> None:
         """Writes data to file, and clears the buffer."""

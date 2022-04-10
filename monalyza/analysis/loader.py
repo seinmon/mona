@@ -15,12 +15,15 @@ class Loader:
         logging.debug("Merging values based on %s column", group)
         return self.data.groupby(group)[self.data.columns[2:]].sum()
 
-    def get_column(self, column) -> pd.DataFrame:
+    def get_column(self, column: str) -> pd.DataFrame:
         """Get all values of a certain column."""
         return self.data.loc[:, column]
 
-    def combine_and_get_column(self, group: str, column: str) -> pd.DataFrame:
-        """Combine entries that have similar values in a certain column,
-        then return a single column of the modified data."""
+    def combine_and_get_column(self, group: str,
+                               column: str) -> pd.DataFrame:
+        """
+        Combine entries that have similar values in a certain column, then
+        return a single column of the modified data.
+        """
         data = self.combine_values_by(group)
         return data.loc[:, column]
