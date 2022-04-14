@@ -2,20 +2,14 @@ import logging
 import psutil
 
 
-def execute_process(command: list[str]) -> int:
-    """Execute the process that needs to be monitored."""
-    proc = psutil.Popen(command)
-    return proc.pid
-
-
-def get_pid_of_process(process: list[str] | str | int) -> int:
+def get_pid_of_process(process: str | int) -> int:
     """Find and return the defined process using its name or pid."""
-    if isinstance(process, list):
-        process = process[0]
+    if isinstance(process, str) and process.isdigit():
+        process = int(process)
 
     logging.debug('Iterating over processes to find %s.', process)
     for proc in psutil.process_iter():
-        if process in (proc.name(), proc.pid):
+        if process == proc.name() or process ==  proc.pid:
             logging.debug('Process found.')
             return proc.pid
 
