@@ -13,21 +13,26 @@ if TYPE_CHECKING:
 class RecursiveMonitoring(threading.Thread):
     """Monitor a process and its children."""
 
-    def __init__(self, pid: int, interval: float,
-                 buffer: 'Buffer') -> None:
+    def __init__(self, pid: int, buffer: 'Buffer',
+                 interval: float = 1, recursion_interval: float = 0.01,
+                 recursion_time: int | None = None) -> None:
         self.pid = pid
         threading.Thread.__init__(self)
 
         logging.info('Initializing recursive monitoring.')
         self.interval = interval
         self.buffer = buffer
+
+        self.recursion_interval = recursion_interval
+        self.recursion_time = recursion_time
         self.processes = []
 
+    # TODO: Add optional time limit for child monitoring.
     def run(self) -> None:
         """Start a monitoring thread for the main process,
         and check for its child processes."""
         logging.debug('Running RecursiveMonitoring.')
-        child_scheduler = scheduler.Scheduler(0.01)
+        child_scheduler = scheduler.Scheduler(self.recursion_interval)
 
         try:
             self.processes.append(psutil.Process(self.pid))
