@@ -1,31 +1,38 @@
 import logging
 import threading
+from typing import TYPE_CHECKING
 import psutil
-from monalyza.monitoring import proc, scheduler, single_process_monitoring as spm
+import monalyza.monitoring.single_process_monitoring as spm
+from monalyza.monitoring import scheduler
+
+
+if TYPE_CHECKING:
+    from monalyza.monitoring.buffer import Buffer
 
 
 class RecursiveMonitoring(threading.Thread):
-    """ Monitor a process and its children. """
-    def __init__(self, process, interval, buffer):
-        try:
-            self.pid = proc.get_pid_of_process(process)
+    """Monitor a process and its children."""
 
-        # pylint: disable=try-except-raise
-        except ProcessLookupError:
-            raise
-
+    def __init__(self, pid: int, buffer: 'Buffer',
+                 interval: float = 1, recursion_interval: float = 0.01,
+                 recursion_time: int | None = None) -> None:
+        self.pid = pid
         threading.Thread.__init__(self)
 
         logging.info('Initializing recursive monitoring.')
         self.interval = interval
         self.buffer = buffer
+
+        self.recursion_interval = recursion_interval
+        self.recursion_time = recursion_time
         self.processes = []
 
-    def run(self):
-        """ Start a monitoring thread for the main process.
-            Also check for the child processes. """
+    # TODO: Add optional time limit for child monitoring.
+    def run(self) -> None:
+        """Start a monitoring thread for the main process,
+        and check for its child processes."""
         logging.debug('Running RecursiveMonitoring.')
-        child_scheduler = scheduler.Scheduler(0.01)
+        child_scheduler = scheduler.Scheduler(self.recursion_interval)
 
         try:
             self.processes.append(psutil.Process(self.pid))
@@ -47,8 +54,8 @@ class RecursiveMonitoring(threading.Thread):
             child_scheduler.cancel_scheduler()
             return
 
-    def monitor_children(self):
-        """ Starts a thread to monitor children of the main process. """
+    def monitor_children(self) -> None:
+        """Starts a thread to monitor children of the main process."""
         try:
             children = psutil.Process(self.pid).children()
 

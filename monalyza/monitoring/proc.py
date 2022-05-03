@@ -2,11 +2,10 @@ import logging
 import psutil
 
 
-def get_pid_of_process(process):
-    """ Find and return the desired process. """
-    logging.debug('Iterating over processes to find %s.', process)
+def get_pid_of_process(process: str | int) -> int:
+    """Find and return the defined process using its name or pid."""
     for proc in psutil.process_iter():
-        if proc.name() == process or proc.pid == process:
+        if process in (proc.name(), proc.pid):
             logging.debug('Process found.')
             return proc.pid
 

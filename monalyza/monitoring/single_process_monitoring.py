@@ -1,38 +1,38 @@
 import logging
 import time
+from typing import TYPE_CHECKING
 import psutil
-from monalyza.monitoring import scheduler, proc
+from monalyza.monitoring import scheduler
+
+
+if TYPE_CHECKING:
+    from monalyza.monitoring.buffer import Buffer
 
 
 class SingleProcessMonitoring:
-    """ Monitoring a single process without its children. """
-    def __init__(self,
-                 process,
-                 interval=None,
-                 buffer=None,
-                 hide_headers=False):
-        try:
-            self.pid = proc.get_pid_of_process(process)
+    """Monitor a single process without its children."""
 
-        # pylint: disable=try-except-raise
-        except ProcessLookupError:
-            raise
+    def __init__(self,
+                 pid: int,
+                 interval: float = None,
+                 buffer: 'Buffer' = None,
+                 hide_headers: bool = False) -> None:
+        self.initial_start_time = 0
+        self.pid = pid
+        self.first_run = not hide_headers
+
+        logging.debug('Initializing single process monitoring.')
+        self.buffer = buffer
+
+        if interval is not None:
+            self.scheduler = scheduler.Scheduler(interval)
 
         else:
-            self.first_run = not hide_headers
+            self.scheduler = None
 
-            logging.debug('Initializing single process monitoring.')
-            self.buffer = buffer
-
-            if interval is not None:
-                self.scheduler = scheduler.Scheduler(interval)
-
-            else:
-                self.scheduler = None
-
-    def run_repeatedly(self, read_memory=False, read_cpu=False):
-        """ Repeat measuring periodically. """
-
+    def run_repeatedly(self, read_memory: bool = False,
+                       read_cpu: bool = False) -> None:
+        """Measure resource consumption of a specific process repeatedly."""
         if self.scheduler is None or self.buffer is None:
             raise UnboundLocalError(
                 'Unexpectped value:',
@@ -52,13 +52,14 @@ class SingleProcessMonitoring:
                 headers = None
 
                 if read_memory and read_cpu:
-                    headers = ('pid', 'time', 'memory', 'cpu')
+                    headers = ('step', 'time', 'pid', 'memory', 'cpu',
+                               'status')
 
                 elif read_memory:
-                    headers = ('pid', 'time', 'memory')
+                    headers = ('step', 'time', 'pid', 'memory', 'status')
 
                 elif read_cpu:
-                    headers = ('pid', 'time', 'cpu')
+                    headers = ('step', 'time', 'pid', 'cpu', 'status')
 
                 self.buffer.append_to_buffer(headers)
                 self.first_run = False
@@ -68,28 +69,36 @@ class SingleProcessMonitoring:
                                     read_memory=read_memory,
                                     read_cpu=read_cpu)
 
-    def read_resource(self, read_memory=False, read_cpu=False):
-        """ Measure resources only once. It is used inside run_repeatedly. """
+    def read_resource(self, read_memory: bool = False,
+                      read_cpu: bool = False) -> tuple | None:
+        """Measure resource consumption of a specific process."""
         resource_info = None
 
         try:
             process = psutil.Process(self.pid)
+            time = self.generate_timestamp()
 
             if read_memory and read_cpu:
-                resource_info = (process.pid,
-                                 self.generate_timestamp(),
+                resource_info = (time[0],
+                                 time[1],
+                                 process.pid,
                                  process.memory_info()[0],
-                                 process.cpu_percent(interval=0.1))
+                                 process.cpu_percent(interval=0.1),
+                                 process.status())
 
             elif read_memory:
-                resource_info = (process.pid,
-                                 self.generate_timestamp(),
-                                 process.memory_info()[0])
+                resource_info = (time[0],
+                                 time[1],
+                                 process.pid,
+                                 process.memory_info()[0],
+                                 process.status())
 
             elif read_cpu:
-                resource_info = (process.pid,
-                                 self.generate_timestamp(),
-                                 process.cpu_percent(interval=1))
+                resource_info = (time[0],
+                                 time[1],
+                                 process.pid,
+                                 process.cpu_percent(interval=1),
+                                 process.status())
 
         except psutil.NoSuchProcess:
             logging.error('Process %s no longer exists.', self.pid)
@@ -98,8 +107,11 @@ class SingleProcessMonitoring:
         else:
             return resource_info
 
-    @staticmethod
-    def generate_timestamp():
-        """ Return current time in miliseconds """
-        # This method does not return the exact time
-        return int(time.time() * 1000)
+    def generate_timestamp(self) -> tuple:
+        """Get time and time difference in seconds, since initial time."""
+        current_time = int(time.time())
+
+        if self.initial_start_time == 0:
+            self.initial_start_time = current_time
+
+        return (current_time - self.initial_start_time, current_time)
