@@ -52,13 +52,14 @@ class SingleProcessMonitoring:
                 headers = None
 
                 if read_memory and read_cpu:
-                    headers = ('pid', 'time', 'memory', 'cpu')
+                    headers = ('step', 'time', 'pid', 'memory', 'cpu',
+                               'status')
 
                 elif read_memory:
-                    headers = ('pid', 'time', 'memory')
+                    headers = ('step', 'time', 'pid', 'memory', 'status')
 
                 elif read_cpu:
-                    headers = ('pid', 'time', 'cpu')
+                    headers = ('step', 'time', 'pid', 'cpu', 'status')
 
                 self.buffer.append_to_buffer(headers)
                 self.first_run = False
@@ -75,22 +76,29 @@ class SingleProcessMonitoring:
 
         try:
             process = psutil.Process(self.pid)
+            time = self.generate_timestamp()
 
             if read_memory and read_cpu:
-                resource_info = (process.pid,
-                                 self.generate_timestamp(),
+                resource_info = (time[0],
+                                 time[1],
+                                 process.pid,
                                  process.memory_info()[0],
-                                 process.cpu_percent(interval=0.1))
+                                 process.cpu_percent(interval=0.1),
+                                 process.status())
 
             elif read_memory:
-                resource_info = (process.pid,
-                                 self.generate_timestamp(),
-                                 process.memory_info()[0])
+                resource_info = (time[0],
+                                 time[1],
+                                 process.pid,
+                                 process.memory_info()[0],
+                                 process.status())
 
             elif read_cpu:
-                resource_info = (process.pid,
-                                 self.generate_timestamp(),
-                                 process.cpu_percent(interval=1))
+                resource_info = (time[0],
+                                 time[1],
+                                 process.pid,
+                                 process.cpu_percent(interval=1),
+                                 process.status())
 
         except psutil.NoSuchProcess:
             logging.error('Process %s no longer exists.', self.pid)
@@ -99,11 +107,11 @@ class SingleProcessMonitoring:
         else:
             return resource_info
 
-    def generate_timestamp(self) -> int:
-        """Get time difference in seconds, since initial time."""
+    def generate_timestamp(self) -> tuple:
+        """Get time and time difference in seconds, since initial time."""
         current_time = int(time.time())
 
         if self.initial_start_time == 0:
             self.initial_start_time = current_time
 
-        return current_time - self.initial_start_time
+        return (current_time - self.initial_start_time, current_time)
