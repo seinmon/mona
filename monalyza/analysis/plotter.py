@@ -1,3 +1,4 @@
+from __future__ import annotations
 import matplotlib.pyplot as plt
 # from monalyza.analysis import loader
 from loader import Loader

@@ -1,3 +1,4 @@
+from __future__ import annotations
 import logging
 from scipy import stats
 # from monalyza.analysis import loader
