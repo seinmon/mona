@@ -82,4 +82,8 @@ def main() -> int:
     initialize_logger()
     logging.info('Starting...')
     command = sys.argv[1]
+
+    if (len(sys.argv) > 2):
+        return start_monitoring(command, output=sys.argv[2])
+
     return start_monitoring(command)
