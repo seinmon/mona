@@ -3,12 +3,12 @@ import logging
 import threading
 from typing import TYPE_CHECKING
 import psutil
-import mona.monitoring.single_process_monitoring as spm
-from mona.monitoring import scheduler
+import mona.core.single_process_monitoring as spm
+from mona.core import scheduler
 
 
 if TYPE_CHECKING:
-    from mona.monitoring.buffer import Buffer
+    from mona.core.buffer import Buffer
 
 
 class RecursiveMonitoring(threading.Thread):

@@ -3,11 +3,11 @@ import logging
 import time
 from typing import TYPE_CHECKING
 import psutil
-from mona.monitoring import scheduler
+from mona.core import scheduler
 
 
 if TYPE_CHECKING:
-    from mona.monitoring.buffer import Buffer
+    from mona.core.buffer import Buffer
 
 
 class SingleProcessMonitoring:
@@ -15,8 +15,8 @@ class SingleProcessMonitoring:
 
     def __init__(self,
                  pid: int,
-                 interval: float = None,
-                 buffer: 'Buffer' = None,
+                 interval: float | None = None,
+                 buffer: 'Buffer' | None  = None,
                  hide_headers: bool = False) -> None:
         self.initial_start_time = 0
         self.pid = pid
@@ -77,26 +77,26 @@ class SingleProcessMonitoring:
 
         try:
             process = psutil.Process(self.pid)
-            time = self.generate_timestamp()
+            timestamp = self.generate_timestamp()
 
             if read_memory and read_cpu:
-                resource_info = (time[0],
-                                 time[1],
+                resource_info = (timestamp[0],
+                                 timestamp[1],
                                  process.pid,
                                  process.memory_info()[0],
                                  process.cpu_percent(interval=0.1),
                                  process.status())
 
             elif read_memory:
-                resource_info = (time[0],
-                                 time[1],
+                resource_info = (timestamp[0],
+                                 timestamp[1],
                                  process.pid,
                                  process.memory_info()[0],
                                  process.status())
 
             elif read_cpu:
-                resource_info = (time[0],
-                                 time[1],
+                resource_info = (timestamp[0],
+                                 timestamp[1],
                                  process.pid,
                                  process.cpu_percent(interval=1),
                                  process.status())
