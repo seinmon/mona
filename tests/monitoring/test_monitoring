@@ -1,6 +1,6 @@
 import unittest
 from unittest.mock import patch
-from monalyza.monitoring.monitoring import Monitoring
+from mona.monitoring.monitoring import Monitoring
 
 
 @unittest.skip('Monitoring is expected to fail')
@@ -30,14 +30,14 @@ class TestMonitoring(unittest.TestCase):
         self.assertRaises(
             ProcessLookupError, Monitoring, 1, 'invalid_proc_name')
 
-    @patch('monalyza.monitoring.scheduler.Scheduler.schedule')
+    @patch('mona.monitoring.scheduler.Scheduler.schedule')
     @patch('psutil.Process')
     def test_run_pid_valid(self, mock_psutil_process, mock_schedule):
         self.monitoring.run_repeatedly()
         mock_psutil_process.assert_called_once_with(self.MockProc.pid)
         mock_schedule.assert_called_once()
 
-    @patch('monalyza.monitoring.scheduler.Scheduler.cancel_scheduler')
+    @patch('mona.monitoring.scheduler.Scheduler.cancel_scheduler')
     def test_run_pid_invalid(self, mock_cancel):
         self.monitoring.run_repeatedly()
         mock_cancel.assert_called_once()

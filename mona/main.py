@@ -3,17 +3,22 @@ from os import path
 import sys
 import logging
 import argparse
-from monalyza.monitoring import proc, buffer
-import monalyza.monitoring.recursive_monitoring as rcm
-import monalyza.monitoring.single_process_monitoring as spm
+from mona.monitoring import proc, buffer
+import mona.monitoring.recursive_monitoring as rcm
+import mona.monitoring.single_process_monitoring as spm
 
 
-def initialize_logger(level = logging.DEBUG,
+def initialize_logger(level: int = logging.DEBUG,
                       verbose_print: bool = True) -> None:
-    """Initialize logger with the specified logging level.
-    If you want to print logs while executing, set verbose_print to true."""
+    """
+    Initialize logger with the specified logging level.
+
+    - Parameters:
+        -- level = in integer regresenting the level of logging
+        -- verpose_print: print logs while executing
+    """
     logging.basicConfig(
-        filename=path.join(path.expanduser('~'), '.monalyza.log'),
+        filename=path.join(path.expanduser('~'), '.mona.log'),
         encoding='utf-8',
         level=level,
         format='%(asctime)s [%(levelname)s]'
@@ -23,19 +28,23 @@ def initialize_logger(level = logging.DEBUG,
         logging.getLogger().addHandler(logging.StreamHandler())
 
 
-# def initialize_argparse() -> argparse.ArgumentParser:
-#     """Initialize argparse with two subparsers for monitoring and analysis."""
-#     parser = argparse.ArgumentParser(prog="Monalyza")
+def initialize_argparse() -> argparse.ArgumentParser:
+    """
+    Initialize argparse
 
-#     # General command line arguments:
-#     parser.add_argument('--version', action='version',
-#                         version='%(prog)s 0.0.1')
-#     parser.add_argument('--verbose', action='store_true',
-#                         help='print logs to to console')
-#     parser.add_argument('--logging-level', type=int,
-#                         help='the level logged messages from 0 (not set),\
-#                         to 5 (critical)')
-#     return parser
+    - Returns: an instance of argparse.ArgumentParser
+    """
+    parser = argparse.ArgumentParser(prog="Mona")
+
+    # General command line arguments:
+    parser.add_argument('--version', action='version',
+                        version='%(prog)s 0.0.1')
+    parser.add_argument('--verbose', action='store_true',
+                        help='print logs to to console')
+    parser.add_argument('--logging-level', type=int,
+                        help='the level logged messages from 0 (not set),\
+                        to 5 (critical)')
+    return parser
 
 
 def start_monitoring(command: str | int,
@@ -47,7 +56,9 @@ def start_monitoring(command: str | int,
                      buffer_size: int = 12000000,
                      recursion_time: int | None = None,
                      recursion_interval: float = 0.01) -> int:
-    """Start monitoring with the selected configuration options."""
+    """
+    Start monitoring with the selected configuration options.
+    """
     output_buffer = buffer.Buffer(buffer_size, output)
 
     try:
@@ -75,10 +86,15 @@ def start_monitoring(command: str | int,
 
 
 def main() -> int:
-    """Starting point of the application."""
+    """
+    Starting point of the application.
+
+    - Returns: exit status as int
+    """
     # args = initialize_argparse().parse_args()
     # initialize_logger(level=args['logging-level'] * 10,
     #                   verbose_print=args['verbose'])
+    
     initialize_logger()
     logging.info('Starting...')
     command = sys.argv[1]

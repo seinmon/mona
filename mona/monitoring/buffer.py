@@ -3,7 +3,7 @@ import csv
 import logging
 from os import getpid
 from typing import Any
-from monalyza.monitoring import single_process_monitoring as spm
+from mona.monitoring import single_process_monitoring as spm
 
 
 class Buffer:

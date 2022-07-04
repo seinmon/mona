@@ -3,11 +3,11 @@ import logging
 import time
 from typing import TYPE_CHECKING
 import psutil
-from monalyza.monitoring import scheduler
+from mona.monitoring import scheduler
 
 
 if TYPE_CHECKING:
-    from monalyza.monitoring.buffer import Buffer
+    from mona.monitoring.buffer import Buffer
 
 
 class SingleProcessMonitoring:

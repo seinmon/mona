@@ -6,16 +6,16 @@ def readme():
         return f.read()
 
 
-setup(name='monalyza',
+setup(name='mona',
       version='0.0.1',
       description='Lightweight resource monitoring and analysis tool.',
       long_description=readme(),
       long_description_content_type='text/markdown',
-      url='http://github.com/seinmon/monalyza',
+      url='http://github.com/seinmon/mona',
       author='Hossein Monjezi',
       author_email='hossein.monjezi@stud.uni-saarland.de',
       license='MIT',
-      packages=['monalyza', 'monalyza.monitoring'],
+      packages=['mona', 'mona.monitoring'],
       classifiers=[
           'Environment :: Console'
           'Development Status :: 2 - Pre-Alpha',
@@ -32,5 +32,5 @@ setup(name='monalyza',
           'Intended Audience :: Developers'
       ],
       install_requires=['psutil', 'pandas', 'matplotlib', 'scipy'],
-      entry_points={'console_scripts': ['monalyza=monalyza.main:main']},
+      entry_points={'console_scripts': ['mona=mona.main:main']},
       zip_safe=False)

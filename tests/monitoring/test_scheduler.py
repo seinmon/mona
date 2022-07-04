@@ -1,7 +1,7 @@
 import time
 import unittest
 from unittest.mock import MagicMock, patch
-from monalyza.monitoring.scheduler import Scheduler
+from mona.monitoring.scheduler import Scheduler
 
 
 class TestScheduler(unittest.TestCase):

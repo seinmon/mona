@@ -26,7 +26,7 @@ test_flake8:
 
 test_pylint:
 	@echo "Running pylint..."
-	pylint monalyza.py monalyza tests
+	pylint mona.py mona tests
 
 clean_pyc:
 	@echo "Deleting compiled python files..."
