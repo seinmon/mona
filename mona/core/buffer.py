@@ -12,6 +12,8 @@ class Buffer:
         logging.debug('Initializing buffer.')
         self.output_file = output_file
         self.data = []
+
+        print(getpid())
         self.buffer_monitoring = spm.SingleProcessMonitoring(getpid())
         self.buffer_size = buffer_size
 

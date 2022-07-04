@@ -15,7 +15,7 @@ setup(name='mona',
       author='Hossein Monjezi',
       author_email='hossein.monjezi@stud.uni-saarland.de',
       license='MIT',
-      packages=['mona', 'mona.monitoring'],
+      packages=['mona', 'mona.core'],
       classifiers=[
           'Environment :: Console'
           'Development Status :: 2 - Pre-Alpha',
