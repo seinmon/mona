@@ -14,8 +14,9 @@ def initialize_logger(level: int = logging.DEBUG,
     Initialize logger with the specified logging level.
 
     - Parameters:
-        -- level = in integer regresenting the level of logging
-        -- verpose_print: print logs while executing
+        -- level = in integer regresenting the level of logging, defaults to
+        DEBUG logging level
+        -- verpose_print: print logs while executing, defaults to True
     """
     logging.basicConfig(
         filename=path.join(path.expanduser('~'), '.mona.log'),
