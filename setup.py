@@ -13,7 +13,7 @@ setup(name='mona',
       long_description_content_type='text/markdown',
       url='http://github.com/seinmon/mona',
       author='Hossein Monjezi',
-      author_email='hossein.monjezi@stud.uni-saarland.de',
+      author_email='hossein.monjezi@live.com',
       license='MIT',
       packages=['mona', 'mona.core'],
       classifiers=[
@@ -31,6 +31,6 @@ setup(name='mona',
           'Operating System :: OS Independent'
           'Intended Audience :: Developers'
       ],
-      install_requires=['psutil', 'pandas', 'matplotlib', 'scipy'],
+      install_requires=['psutil'],
       entry_points={'console_scripts': ['mona=mona.main:main']},
       zip_safe=False)
