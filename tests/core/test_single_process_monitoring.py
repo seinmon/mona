@@ -1,6 +1,6 @@
 import unittest
 from unittest.mock import patch
-from mona.monitoring.monitoring import Monitoring
+from mona.core import single_process_monitoring as spm
 
 
 @unittest.skip('Monitoring is expected to fail')
@@ -15,7 +15,8 @@ class TestMonitoring(unittest.TestCase):
     def setUp(self):
         self.patcher = patch('psutil.process_iter',
                              return_value=[self.MockProc()]).start()
-        self.monitoring = Monitoring('FakeProcess', 1, 1000000, 'test_output')
+        self.monitoring = spm.SingleProcessMonitoring('FakeProcess', 1,
+                                                      1000000, 'test_output')
 
     def tearDown(self):
         self.patcher.stop()
