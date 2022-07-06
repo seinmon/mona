@@ -38,7 +38,7 @@ class TestScheduler(unittest.TestCase):
         mock_monitoring_function.assert_called_once()
 
     @patch('threading.Timer.cancel')
-    def test_cacel_not_running_not_scheduled(self, mock_cancel):
+    def test_cancel_not_running_not_scheduled(self, mock_cancel):
         self.scheduler.cancel_scheduler()
         mock_cancel.assert_not_called()
 
