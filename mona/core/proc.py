@@ -5,9 +5,10 @@ import psutil
 
 def get_pid_of_process(process: str | int) -> int:
     """
-    Find and return the defined process using its name or pid.
+    Find and return the defined process using its name or pid
 
-    Note: This method is only tested for normal processes (eg. not deamons).
+    Note: This method is only tested for normal processes. Deamons are still
+    not tested.
 
     - Parameters:
         -- process: an string or integer value representing the pid or process

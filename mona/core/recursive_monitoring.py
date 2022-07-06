@@ -17,6 +17,19 @@ class RecursiveMonitoring(threading.Thread):
     def __init__(self, pid: int, buffer: 'Buffer',
                  interval: float = 1, recursion_interval: float = 0.01,
                  recursion_time: int | None = None) -> None:
+        """
+        Monitor a process and its children
+
+        - Parameters:
+            -- pid: pid of the target process
+            -- buffer: an instance of the buffer
+            -- interval: interval of repeating the measurements in seconds,
+            default value is 1
+            -- recursion_interval: interval of searching for subprocesses in
+            seconds, default value is 0.1
+            -- recursion_time: still not implemented -- duration of searching
+            for subprocesses
+        """
         self.pid = pid
         threading.Thread.__init__(self)
 
@@ -30,8 +43,10 @@ class RecursiveMonitoring(threading.Thread):
 
     # TODO: Add optional time limit for child monitoring.
     def run(self) -> None:
-        """Start a monitoring thread for the main process,
-        and check for its child processes."""
+        """
+        Start a monitoring thread for the main process, and check for its
+        child processes
+        """
         logging.debug('Running RecursiveMonitoring.')
         child_scheduler = scheduler.Scheduler(self.recursion_interval)
 
@@ -56,7 +71,7 @@ class RecursiveMonitoring(threading.Thread):
             return
 
     def monitor_children(self) -> None:
-        """Starts a thread to monitor children of the main process."""
+        """Starts a thread to monitor children of the main process"""
         try:
             children = psutil.Process(self.pid).children()
 

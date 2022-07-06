@@ -8,17 +8,32 @@ from mona.core import single_process_monitoring as spm
 
 class Buffer:
     """Write the measurements to a csv file, once a threshold is reached."""
+
     def __init__(self, buffer_size: int, output_file: str) -> None:
+        """
+        Write the measurements to a csv file, once a threshold is reached
+
+        - Parameters:
+            -- buffer_size: size of the buffer in bytes
+            -- output_file: address of the file to write the data when clearing
+            the buffer
+        """
         logging.debug('Initializing buffer.')
         self.output_file = output_file
         self.data = []
-
-        print(getpid())
         self.buffer_monitoring = spm.SingleProcessMonitoring(getpid())
         self.buffer_size = buffer_size
 
     def append_to_buffer(self, data: Any) -> None:
-        """Add data to the buffer, and write to csv file if it is necessary."""
+        """
+        Add data to the buffer, and write to csv file if it is necessary
+
+        Modules that want to use buffer should only use append_to_buffer
+        method. Other methods are to be used within the buffer itself.
+
+        - Parameters:
+            -- data: the data to add to the buffer
+        """
         logging.debug('Appending to buffer.')
         self.data.append(data)
 
@@ -29,7 +44,7 @@ class Buffer:
                 self.write_data()
 
     def write_data(self) -> None:
-        """Writes data to file, and clears the buffer."""
+        """Writes data to file, and clears the buffer"""
         with open(self.output_file, 'a+', encoding='UTF-8') as csv_output:
             if self.data:
                 writer = csv.writer(csv_output)

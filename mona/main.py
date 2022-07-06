@@ -3,9 +3,9 @@ from os import path
 import sys
 import logging
 import argparse
-from mona.monitoring import proc, buffer
-import mona.monitoring.recursive_monitoring as rcm
-import mona.monitoring.single_process_monitoring as spm
+from mona.core import proc, buffer
+import mona.core.recursive_monitoring as rcm
+import mona.core.single_process_monitoring as spm
 
 
 def initialize_logger(level: int = logging.DEBUG,
@@ -14,9 +14,9 @@ def initialize_logger(level: int = logging.DEBUG,
     Initialize logger with the specified logging level.
 
     - Parameters:
-        -- level = in integer regresenting the level of logging, defaults to
-        DEBUG logging level
-        -- verpose_print: print logs while executing, defaults to True
+        -- level = in integer regresenting the level of logging, default value
+        is logging.DEBUG
+        -- verpose_print: print logs while executing, default value is True
     """
     logging.basicConfig(
         filename=path.join(path.expanduser('~'), '.mona.log'),
@@ -58,7 +58,26 @@ def start_monitoring(command: str | int,
                      recursion_time: int | None = None,
                      recursion_interval: float = 0.01) -> int:
     """
-    Start monitoring with the selected configuration options.
+    Start monitoring with the selected configuration options
+
+    - Parameters:
+        -- process: pid or name of the target process
+        -- read_memory: set true to monitor memory, default value is True
+        -- read_cpu: set true to monitor cpu, default value is True
+        -- recursive: set true to monitor subprocesses of the target process,
+        default value is True
+        -- interval: inteval of repeating measurements in seconds, default
+        value is 1
+        -- output: address of the output file, defaults  value is
+        measurements_output.csv
+        -- buffer_size: size of the buffered measurements in bytes, default
+        value is 12000000 bytes
+        -- recursion_time: currently not implemented -- duration of
+        searching for subprocesses
+        -- recursion_interval: interval of searching for subprocesses in
+        seconds, default value is 0.1
+
+    - Returns: exit status
     """
     output_buffer = buffer.Buffer(buffer_size, output)
 
@@ -90,7 +109,7 @@ def main() -> int:
     """
     Starting point of the application.
 
-    - Returns: exit status as int
+    - Returns: exit status
     """
     # args = initialize_argparse().parse_args()
     # initialize_logger(level=args['logging-level'] * 10,
