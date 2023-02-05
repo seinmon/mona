@@ -1,6 +1,11 @@
 from __future__ import annotations
 import threading
 import logging
+from typing import TYPE_CHECKING
+
+
+if TYPE_CHECKING:
+    from typing import Callable, Any
 
 
 class Scheduler:
@@ -17,19 +22,18 @@ class Scheduler:
         self.running = False
         self.interval = interval
 
-    # TODO: Add type annotations
-    def schedule(self, task, **params) -> None:
+    def schedule(self, task: Callable, **kwargs: Any) -> None:
         """
-        Schedule a function to be executed with **params as parameters
+        Schedule a function to be executed with **kwargs as parameters
 
         - Parameters:
             -- task: the function to be executed
-            -- **params: a list of parameters to use in the task
+            -- **kwargs: a list of parameters to use in the task
         """
         logging.info('Scheduling the next run.')
         if task is not None:
             self.running = True
-            self.scheduled_timer = threading.Timer(self.interval, task, params)
+            self.scheduled_timer = threading.Timer(self.interval, task, kwargs)
             self.scheduled_timer.start()
             logging.info('Scheduled the next run successfully.')
 

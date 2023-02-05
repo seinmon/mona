@@ -2,8 +2,9 @@ from setuptools import setup
 
 
 def readme():
-    with open('README.md') as f:
-        return f.read()
+    """Read and return the content of README.md file."""
+    with open('README.md', encoding='utf-8') as readme_file:
+        return readme_file.read()
 
 
 setup(name='mona',
@@ -28,7 +29,6 @@ setup(name='mona',
           'Programming Language :: Python :: 3.11'
           'Topic :: System :: Monitoring'
           'Topic :: Scientific/Engineering'
-          'Operating System :: OS Independent'
           'Intended Audience :: Developers'
       ],
       install_requires=['psutil'],

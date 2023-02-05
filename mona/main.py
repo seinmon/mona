@@ -1,22 +1,19 @@
 from __future__ import annotations
 from os import path
-import sys
 import logging
 import argparse
-from mona.core import proc, buffer
+from mona.core import proc, buffer, monitoring
 import mona.core.recursive_monitoring as rcm
-import mona.core.single_process_monitoring as spm
 
 
 def initialize_logger(level: int = logging.DEBUG,
-                      verbose_print: bool = True) -> None:
+                      verbose_print: bool = False) -> None:
     """
     Initialize logger with the specified logging level.
 
     - Parameters:
-        -- level = in integer regresenting the level of logging, default value
-        is logging.DEBUG
-        -- verpose_print: print logs while executing, default value is True
+        -- level = logging level, defaults to logging.DEBUG
+        -- verpose_print: print logs while executing, default value is False
     """
     logging.basicConfig(
         filename=path.join(path.expanduser('~'), '.mona.log'),
@@ -35,19 +32,50 @@ def initialize_argparse() -> argparse.ArgumentParser:
 
     - Returns: an instance of argparse.ArgumentParser
     """
-    parser = argparse.ArgumentParser(prog="Mona")
+    parser = argparse.ArgumentParser(prog='Mona')
 
-    # General command line arguments:
-    parser.add_argument('--version', action='version',
-                        version='%(prog)s 0.0.1')
-    parser.add_argument('--verbose', action='store_true',
+    parser.add_argument('process',
+                        help='PID or the name of the process to profile')
+
+    parser.add_argument('-i', '--interval', type=float, default=0.9,
+                        help='time interval of sampling resource values')
+
+    parser.add_argument('--cpu', action='store_true',
+                        help='measure CPU consumption')
+
+    parser.add_argument('--memory', action='store_true',
+                        help='measure memory consumption')
+
+    parser.add_argument('-o', '--output', type=str,
+                        default='measurements_output.csv',
+                        help='Address of the measurements file')
+
+    parser.add_argument('-b', '--buffer-size', type=int, default=12000000,
+                        help='Size of the buffer (in bytes)')
+
+    parser.add_argument('-r', '--recursive', action='store_true',
+                        help='look up subprocesses and profile them as well')
+
+    parser.add_argument('-ri', '--recursive_with_interval', type=float,
+                        default=0.1, help='recursive profiling, with interval\
+                        for looking up subprocesses')
+
+    parser.add_argument('-v', '--verbose', action='store_true',
                         help='print logs to to console')
-    parser.add_argument('--logging-level', type=int,
-                        help='the level logged messages from 0 (not set),\
-                        to 5 (critical)')
+
+    parser.add_argument('-l', '--logging-level', type=int,
+                        choices=[1, 2, 3, 4, 5], default=4,
+                        help='the level of logged messages from 1 (all logs) \
+                        to 5 (critical logs only).')
+
+    parser.add_argument('--version', action='version',
+                        version='%(prog)s 0.0.1', help='Print version number')
+
     return parser
 
 
+# I added default values to the function, in case in was used without argparse
+# pylint: disable-next=too-many-arguments
 def start_monitoring(command: str | int,
                      read_memory: bool = True,
                      read_cpu: bool = True,
@@ -55,8 +83,7 @@ def start_monitoring(command: str | int,
                      interval: float = 1,
                      output: str = 'measurements_output.csv',
                      buffer_size: int = 12000000,
-                     recursion_time: int | None = None,
-                     recursion_interval: float = 0.01) -> int:
+                     recursion_interval: float = 0.1) -> int:
     """
     Start monitoring with the selected configuration options
 
@@ -72,8 +99,6 @@ def start_monitoring(command: str | int,
         measurements_output.csv
         -- buffer_size: size of the buffered measurements in bytes, default
         value is 12000000 bytes
-        -- recursion_time: currently not implemented -- duration of
-        searching for subprocesses
         -- recursion_interval: interval of searching for subprocesses in
         seconds, default value is 0.1
 
@@ -88,21 +113,18 @@ def start_monitoring(command: str | int,
         logging.error(repr(p_err))
         return 1
 
+    if recursive:
+        mona = rcm.RecursiveMonitoring(pid, output_buffer,
+                                       interval=interval,
+                                       recursion_interval=recursion_interval)
+        mona.start()
+
     else:
-        if recursive:
-            monitor = rcm.RecursiveMonitoring(pid, output_buffer,
-                                              interval=interval,
-                                              recursion_time=recursion_time,
-                                              recursion_interval=
-                                              recursion_interval)
-            monitor.start()
+        mona = monitoring.Monitoring(pid, interval=interval,
+                                     buffer=output_buffer)
+        mona.run_repeatedly(read_memory, read_cpu)
 
-        else:
-            monitor = spm.SingleProcessMonitoring(pid, interval=interval,
-                                                  buffer=output_buffer)
-            monitor.run_repeatedly(read_memory, read_cpu)
-
-        return 0
+    return 0
 
 
 def main() -> int:
@@ -111,15 +133,22 @@ def main() -> int:
 
     - Returns: exit status
     """
-    # args = initialize_argparse().parse_args()
-    # initialize_logger(level=args['logging-level'] * 10,
-    #                   verbose_print=args['verbose'])
-    
-    initialize_logger()
+    args = initialize_argparse().parse_args()
+    initialize_logger(level=args.logging_level * 10,
+                      verbose_print=args.verbose)
+
     logging.info('Starting...')
-    command = sys.argv[1]
 
-    if (len(sys.argv) > 2):
-        return start_monitoring(command, output=sys.argv[2])
+    if not (args.cpu or args.memory):
+        args.cpu = True
+        args.memory = True
 
-    return start_monitoring(command)
+    if args.recursive_with_interval:
+        args.recursive = True
+
+    return start_monitoring(
+        args.process, read_memory=args.memory, read_cpu=args.cpu,
+        recursive=args.recursive, interval=args.interval, output=args.output,
+        buffer_size=args.buffer_size,
+        recursion_interval=args.recursive_with_interval
+    )

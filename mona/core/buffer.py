@@ -2,8 +2,12 @@ from __future__ import annotations
 import csv
 import logging
 from os import getpid
-from typing import Any
-from mona.core import single_process_monitoring as spm
+from typing import TYPE_CHECKING
+from mona.core import monitoring
+
+
+if TYPE_CHECKING:
+    from typing import Any
 
 
 class Buffer:
@@ -21,7 +25,7 @@ class Buffer:
         logging.debug('Initializing buffer.')
         self.output_file = output_file
         self.data = []
-        self.buffer_monitoring = spm.SingleProcessMonitoring(getpid())
+        self.buffer_monitoring = monitoring.Monitoring(getpid())
         self.buffer_size = buffer_size
 
     def append_to_buffer(self, data: Any) -> None:

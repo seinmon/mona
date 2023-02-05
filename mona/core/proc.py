@@ -16,7 +16,7 @@ def get_pid_of_process(process: str | int) -> int:
 
     - Returns: if the pid or process name exists, returns the pid
 
-    - Raises: 
+    - Raises:
         -- ProcessLookupError: If pid or process name does not exists
     """
     for proc in psutil.process_iter():

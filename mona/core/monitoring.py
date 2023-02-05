@@ -10,13 +10,13 @@ if TYPE_CHECKING:
     from mona.core.buffer import Buffer
 
 
-class SingleProcessMonitoring:
+class Monitoring:
     """Monitor a single process without its children."""
 
     def __init__(self,
                  pid: int,
                  interval: float | None = None,
-                 buffer: 'Buffer' | None  = None,
+                 buffer: Buffer | None = None,
                  hide_headers: bool = False) -> None:
         """
         Monitor a single process without its children
@@ -138,8 +138,7 @@ class SingleProcessMonitoring:
             logging.error('Process %s no longer exists.', self.pid)
             raise
 
-        else:
-            return resource_info
+        return resource_info
 
     def generate_timestamp(self) -> tuple[int, int]:
         """
